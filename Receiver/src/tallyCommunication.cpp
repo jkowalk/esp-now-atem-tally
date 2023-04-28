@@ -1,0 +1,92 @@
+#include "tallyCommunication.h"
+
+#include <Arduino.h>
+#include <ESP8266WiFi.h>
+#include <espnow.h>
+
+#include "leds.h"
+#include "memory.h"
+#include "configWebserver.h"
+
+long lastMessageReceived;
+
+// Broadcast address, sends to all devices nearby
+uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+// Structure example to send data
+// Must match the receiver structure
+typedef struct struct_message
+{
+  int program;
+  int preview;
+  boolean transition;
+  boolean request;
+} struct_message;
+
+// Create a struct_message called recvData
+struct_message recvData;
+
+// Callback function that will be executed when data is received
+void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len)
+{
+  lastMessageReceived = millis();
+  memcpy(&recvData, incomingData, sizeof(recvData));
+  Serial.println("Bytes received: " + String(len));
+  Serial.println("Program: " + String(recvData.program));
+  Serial.println("Preview: " + String(recvData.preview));
+  Serial.println("Transition: " + String(recvData.transition));
+  Serial.println("Request: " + String(recvData.request));
+
+  if (recvData.request == true)
+    return;
+
+  if (recvData.program == camId)
+    digitalWrite(PROGRAM_LED, HIGH);
+
+  if (recvData.preview == camId)
+    digitalWrite(PREVIEW_LED, HIGH);
+
+  if (recvData.program != camId && !recvData.transition)
+    digitalWrite(PROGRAM_LED, LOW);
+
+  if (recvData.preview != camId && !recvData.transition)
+    digitalWrite(PREVIEW_LED, LOW);
+}
+
+void requestState()
+{
+  // send request
+  recvData = {0, 0, false, true};
+  esp_now_send(broadcastAddress, (uint8_t *)&recvData, sizeof(recvData));
+}
+
+void setupEspNow()
+{
+  // Set device as a Wi-Fi Station
+  WiFi.mode(WIFI_STA);
+
+  // Init ESP-NOW
+  if (esp_now_init() != 0)
+  {
+    Serial.println("Error initializing ESP-NOW");
+    return;
+  }
+
+  esp_now_set_self_role(ESP_NOW_ROLE_SLAVE);
+  esp_now_register_recv_cb(OnDataRecv);
+
+  requestState();
+  lastMessageReceived = millis();
+}
+
+void espNowLoop()
+{
+  if (millis() - lastMessageReceived > (5 * 60 * 1000)) // 5 minutes
+  {
+    requestState();
+    digitalWrite(STATUS_LED, LOW);
+  } else {
+    digitalWrite(STATUS_LED, HIGH);
+  }
+  delay(5);
+}
