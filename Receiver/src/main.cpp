@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 #include "configWebserver.h"
-#include "tallyCommunication.h"
+#include "espNowReceiver.h"
 #include "leds.h"
 #include "memory.h"
 

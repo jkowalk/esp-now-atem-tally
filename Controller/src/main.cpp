@@ -39,6 +39,7 @@ void loop()
   {
     digitalWrite(ERROR_LED_PIN, LOW);
   }
+  
   if (checkForAtemChanges())
   {
     sendCurrentAtemState();

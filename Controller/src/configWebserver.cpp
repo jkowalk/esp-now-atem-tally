@@ -95,7 +95,11 @@ void handleDebugForm()
   }
   else
   {
-    sendMessage(server.arg("program").toInt(), server.arg("preview").toInt(), server.arg("transition") == "on" ? true : false, false);
+    boolean program[21] = {false};
+    boolean preview[21] = {false};
+    program[server.arg("program").toInt() - 1] = true;
+    preview[server.arg("preview").toInt() - 1] = true;
+    sendMessage(program, preview, server.arg("transition") == "on" ? true : false, false);
 
     String message = "Sent with success";
     server.send(200, F("text/plain"), message);

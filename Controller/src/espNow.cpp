@@ -6,6 +6,7 @@
 #include <WiFi.h>
 
 #include "atemConnection.h"
+#include "constants.h"
 
 // Broadcast address, sends to all devices nearby
 uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
@@ -14,20 +15,20 @@ uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 // Must match the receiver structure
 typedef struct struct_message
 {
-  int program;
-  int preview;
+  boolean program[maxAtemInputs];
+  boolean preview[maxAtemInputs];
   boolean transition;
   boolean request;
 } struct_message;
 
-// Create a struct_message called myData
-struct_message myData;
+// Create a struct_message called messageData
+struct_message messageData;
 
 esp_now_peer_info_t peerInfo;
 
 void sendCurrentAtemState()
 {
-  sendMessage(getProgramInput(), getPreviewInput(), getTransition(), false);
+  sendMessage(getProgramTallyArray(), getPreviewTallyArray(), getTransition(), false);
 }
 
 // callback when data is sent
@@ -42,9 +43,6 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len)
 {
   struct_message *data = (struct_message *)incomingData;
   Serial.println("Received: ");
-  Serial.println("Program: " + String(data->program));
-  Serial.println("Preview: " + String(data->preview));
-  Serial.println("Transition: " + String(data->transition));
   Serial.println("Request: " + String(data->request));
 
   if (data->request)
@@ -86,11 +84,11 @@ void setupEspNow()
   }
 }
 
-void sendMessage(int program, int preview, boolean transition, boolean request)
+void sendMessage(boolean * program, boolean * preview, boolean transition, boolean request)
 {
   struct_message data;
-  data.preview = preview;
-  data.program = program;
+  memccpy(data.program, program, maxAtemInputs, sizeof(program));
+  memccpy(data.preview, preview, maxAtemInputs, sizeof(preview));
   data.transition = transition;
   data.request = request;
 

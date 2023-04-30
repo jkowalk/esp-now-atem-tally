@@ -6,6 +6,7 @@
 #include <ATEMstd.h>
 
 #include "memory.h"
+#include "constants.h"
 
 ATEMstd AtemSwitcher;
 
@@ -17,11 +18,7 @@ boolean isInTransition(int transitionPosition)
 {
   Serial.print("Transition: ");
   Serial.println(transitionPosition);
-  if (transitionPosition > 0 && transitionPosition < 100)
-  {
-    return true;
-  }
-  return false;
+  return transitionPosition != 0;
 }
 
 boolean atemIsConnected()
@@ -84,6 +81,27 @@ boolean getTransition()
   return isInTransition(AtemSwitcher.getTransitionPosition());
 }
 
+boolean programTally[maxAtemInputs];
+boolean previewTally[maxAtemInputs];
+
+boolean * getProgramTallyArray()
+{
+  for (int i = 0; i < maxAtemInputs; i++)
+  {
+    programTally[i] = AtemSwitcher.getProgramTally(i + 1);
+  }
+  return programTally;
+}
+
+boolean * getPreviewTallyArray()
+{
+  for (int i = 0; i < maxAtemInputs; i++)
+  {
+    previewTally[i] = AtemSwitcher.getPreviewTally(i + 1);
+  }
+  return previewTally;
+}
+
 String getATEMInformation()
 {
   String message = F("ATEM Information:\n\n");
@@ -91,7 +109,7 @@ String getATEMInformation()
   message += String(AtemSwitcher.getProgramInput());
   message += F("\ngetPreviewInput: ");
   message += String(AtemSwitcher.getPreviewInput());
-  for (int i = 1; i < 4; i++)
+  for (int i = 1; i < 9; i++)
   {
     message += "\ngetProgramTally " + String(i) + F(": ");
     message += String(AtemSwitcher.getProgramTally(i));

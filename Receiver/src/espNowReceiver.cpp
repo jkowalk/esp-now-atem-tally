@@ -1,4 +1,4 @@
-#include "tallyCommunication.h"
+#include "espNowReceiver.h"
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
@@ -7,6 +7,7 @@
 #include "leds.h"
 #include "memory.h"
 #include "configWebserver.h"
+#include "constants.h"
 
 long lastMessageReceived;
 
@@ -17,8 +18,8 @@ uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 // Must match the receiver structure
 typedef struct struct_message
 {
-  int program;
-  int preview;
+  boolean program[maxAtemInputs];
+  boolean preview[maxAtemInputs];
   boolean transition;
   boolean request;
 } struct_message;
@@ -32,25 +33,17 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len)
   lastMessageReceived = millis();
   memcpy(&recvData, incomingData, sizeof(recvData));
   Serial.println("Bytes received: " + String(len));
-  Serial.println("Program: " + String(recvData.program));
-  Serial.println("Preview: " + String(recvData.preview));
+  Serial.println("Program: " + String(recvData.program[camId - 1]));
+  Serial.println("Preview: " + String(recvData.preview[camId - 1]));
   Serial.println("Transition: " + String(recvData.transition));
   Serial.println("Request: " + String(recvData.request));
 
   if (recvData.request == true)
     return;
 
-  if (recvData.program == camId)
-    digitalWrite(PROGRAM_LED, HIGH);
+  digitalWrite(PROGRAM_LED, recvData.program[camId - 1] ? HIGH : LOW);
 
-  if (recvData.preview == camId)
-    digitalWrite(PREVIEW_LED, HIGH);
-
-  if (recvData.program != camId && !recvData.transition)
-    digitalWrite(PROGRAM_LED, LOW);
-
-  if (recvData.preview != camId && !recvData.transition)
-    digitalWrite(PREVIEW_LED, LOW);
+  digitalWrite(PREVIEW_LED, recvData.preview[camId - 1] ? HIGH : LOW);
 }
 
 void requestState()
@@ -81,8 +74,9 @@ void setupEspNow()
 
 void espNowLoop()
 {
-  if (millis() - lastMessageReceived > (5 * 60 * 1000)) // 5 minutes
+  if (millis() - lastMessageReceived > timeBetweenStateRequests)
   {
+    lastMessageReceived += 3000;
     requestState();
     digitalWrite(STATUS_LED, LOW);
   } else {
