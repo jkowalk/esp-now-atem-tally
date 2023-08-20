@@ -17,14 +17,20 @@ void setup()
   pinMode(PROGRAM_LED, OUTPUT);
   pinMode(PREVIEW_LED, OUTPUT);
   pinMode(STATUS_LED, OUTPUT);
-  digitalWrite(STATUS_LED, LOW);
+
+  analogWriteFreq(PWMFREQ); // Set PWM frequency
+  analogWriteRange(PWMRES); // Set PWM resolution
+
+  analogWrite(STATUS_LED, 0);
 
   pinMode(CONFIG_BUTTON, INPUT_PULLDOWN_16);
 
   loadCameraId();
 
+  // Let status LED blink as often as Cam Id (max 10)
+  blinkStatusLed(3, 100);
   delay(500);
-  blinkStatusLed(camId);
+  blinkStatusLed(min(10, camId), 400);
   delay(500);
 
   if (digitalRead(CONFIG_BUTTON) == HIGH)
@@ -37,7 +43,7 @@ void setup()
   }
 
   setupEspNow();
-  digitalWrite(STATUS_LED, HIGH);
+  analogWrite(STATUS_LED, STATUS_BRIGHTNESS);
 }
 
 void loop()
