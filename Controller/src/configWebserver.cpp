@@ -16,6 +16,7 @@ const String postForms[2] = {
       body { background-color: #e6e5df; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; display: flex; justify-content: center; margin-top: 4rem; }\
       form { display: flex; }\
       .container { display: flex; flex-direction: column; align-items: center; }\
+      .links { position: fixed; bottom: 0; margin: 1rem; width: 100%; display: flex; justify-content: center; }\
       </style>\
       </head>\
       <body>\
@@ -26,6 +27,11 @@ const String postForms[2] = {
     F("\"><br>\
       <input type=\"submit\" value=\"Submit\">\
       </form>\
+      </div>\
+      <div class=\"links\">\
+      <a href=\"debug\">Debug Form</a>\
+      &nbsp;&nbsp;\
+      <a href=\"atem\">ATEM Information</a>\
       </div>\
       </body>\
       </html>")};
