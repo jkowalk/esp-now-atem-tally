@@ -26,6 +26,8 @@ void setup()
   setupAtemConnection();
 }
 
+long lastMessageSent = 0;
+
 void loop()
 {
   webserverLoop();
@@ -40,9 +42,10 @@ void loop()
     digitalWrite(ERROR_LED_PIN, LOW);
   }
   
-  if (checkForAtemChanges())
+  if (checkForAtemChanges() || (millis() - lastMessageSent > timeBetweenAtemStateMessages))
   {
     sendCurrentAtemState();
+    lastMessageSent = millis();
   }
   delay(5);
 }

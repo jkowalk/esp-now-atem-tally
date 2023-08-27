@@ -49,7 +49,7 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len)
 void requestState()
 {
   // send request
-  recvData = {0, 0, false, true};
+  recvData = {false, false, false, true};
   esp_now_send(broadcastAddress, (uint8_t *)&recvData, sizeof(recvData));
 }
 
@@ -76,7 +76,7 @@ void espNowLoop()
 {
   if (millis() - lastMessageReceived > timeBetweenStateRequests)
   {
-    lastMessageReceived += 3000;
+    lastMessageReceived += 1000;
     requestState();
     analogWrite(STATUS_LED, 0);
   } else {
