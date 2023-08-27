@@ -12,19 +12,19 @@ void configLedAnimation()
     switch (led_animation)
     {
     case 0:
-      digitalWrite(PROGRAM_LED, HIGH);
-      digitalWrite(PREVIEW_LED, LOW);
-      digitalWrite(STATUS_LED, LOW);
+      analogWrite(PROGRAM_LED, PROGRAM_BRIGHTNESS);
+      analogWrite(PREVIEW_LED, 0);
+      analogWrite(STATUS_LED, 0);
       break;
     case 1:
-      digitalWrite(PROGRAM_LED, LOW);
-      digitalWrite(PREVIEW_LED, HIGH);
-      digitalWrite(STATUS_LED, LOW);
+      analogWrite(PROGRAM_LED, 0);
+      analogWrite(PREVIEW_LED, PREVIEW_BRIGHTNESS);
+      analogWrite(STATUS_LED, 0);
       break;
     case 2:
-      digitalWrite(PROGRAM_LED, LOW);
-      digitalWrite(PREVIEW_LED, LOW);
-      digitalWrite(STATUS_LED, HIGH);
+      analogWrite(PROGRAM_LED, 0);
+      analogWrite(PREVIEW_LED, 0);
+      analogWrite(STATUS_LED, STATUS_BRIGHTNESS);
       break;
     }
     led_animation++;
@@ -33,13 +33,13 @@ void configLedAnimation()
   }
 }
 
-void blinkStatusLed(int times)
+void blinkStatusLed(int times, int delayTime)
 {
   for (int i = 0; i < times; i++)
   {
-    digitalWrite(STATUS_LED, HIGH);
-    delay(1000);
-    digitalWrite(STATUS_LED, LOW);
-    delay(1000);
+    analogWrite(STATUS_LED, STATUS_BRIGHTNESS);
+    delay(delayTime);
+    analogWrite(STATUS_LED, 0);
+    delay(delayTime);
   }
 }

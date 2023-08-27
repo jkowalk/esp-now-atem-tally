@@ -41,9 +41,9 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len)
   if (recvData.request == true)
     return;
 
-  digitalWrite(PROGRAM_LED, recvData.program[camId - 1] ? HIGH : LOW);
+  analogWrite(PROGRAM_LED, recvData.program[camId - 1] ? PROGRAM_BRIGHTNESS : 0);
 
-  digitalWrite(PREVIEW_LED, recvData.preview[camId - 1] ? HIGH : LOW);
+  analogWrite(PREVIEW_LED, recvData.preview[camId - 1] ? PREVIEW_BRIGHTNESS : 0);
 }
 
 void requestState()
@@ -78,9 +78,9 @@ void espNowLoop()
   {
     lastMessageReceived += 3000;
     requestState();
-    digitalWrite(STATUS_LED, LOW);
+    analogWrite(STATUS_LED, 0);
   } else {
-    digitalWrite(STATUS_LED, HIGH);
+    analogWrite(STATUS_LED, STATUS_BRIGHTNESS);
   }
   delay(5);
 }
