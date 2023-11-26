@@ -21,9 +21,7 @@ We use a WT32-ETH01 module as a Controller and ESP8266 Mini D1 modules as Client
 | xxx mm screws | x per Receiver/Controller | [Ebay](); [AliExpress]() |
 
 ### 3D Printed Case
-TODO: Add files
-
-You can find the STL files in the ``./XXXX`` folder.
+You can find the STL files in the ``./assets/printfiles`` folder.
 
 
 #### Print Settings
